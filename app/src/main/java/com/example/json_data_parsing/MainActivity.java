@@ -6,6 +6,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,19 +41,35 @@ private TextView textView;
                 InputStream inputStream = httpURLConnection.getInputStream();
                 bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 StringBuffer stringBuffer = new StringBuffer();
+                StringBuffer stringBuffer1 = new StringBuffer();
                 String line = "";
+                String name;
+                int age;
+                String description;
 
                 while ((line=bufferedReader.readLine())!=null){
                     stringBuffer.append(line);
                 }
-                return stringBuffer.toString();
+                String file = stringBuffer.toString();
+                JSONObject fileObject = new JSONObject(file);
+                JSONArray jsonArray = fileObject.getJSONArray("studentinfo");
+                for (int i = 0; i<jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    name = jsonObject.getString("name");
+                    age = jsonObject.getInt("age");
+                    description = jsonObject.getString("description");
+
+                    stringBuffer1.append(name+"\n"+age+"\n"+description);
+                }
+              return stringBuffer1.toString();
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-            finally {
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } finally {
                 httpURLConnection.disconnect();
                 try {
                     bufferedReader.close();
